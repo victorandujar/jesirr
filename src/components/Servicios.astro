@@ -1,0 +1,23 @@
+---
+import { ui, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang].servicios;
+---
+<section aria-labelledby="serv-t">
+  <div class="mx-auto grid max-w-[90rem] gap-12 px-4 py-20 sm:px-8 sm:py-28 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <p class="label text-roig-fosc" data-reveal>{tx.label}</p>
+      <h2 id="serv-t" class="titol mt-4 text-[clamp(2.2rem,4.6vw,4rem)]" data-reveal style="--i:1">{tx.title}</h2>
+      <p class="mt-6 max-w-md text-lg text-gris" data-reveal style="--i:2">{tx.text}</p>
+    </div>
+    <ul class="grid self-start content-start gap-px bg-linia sm:grid-cols-2 lg:col-span-6 lg:col-start-7">
+      {tx.items.map((it, i) => (
+        <li class="group flex items-baseline gap-4 bg-crema px-5 py-5 transition-colors duration-300 hover:bg-ferro hover:text-crema" data-reveal style={`--i:${i % 4}`}>
+          <span class="label text-roig-fosc group-hover:text-roig">{String(i + 1).padStart(2, '0')}</span>
+          <span class="text-xl font-semibold">{it}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

@@ -1,0 +1,28 @@
+---
+import { Image } from 'astro:assets';
+import { artesania } from '../data/empresa';
+import { ui, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang].artesania;
+const fotos = import.meta.glob<{ default: ImageMetadata }>('../assets/treballs/*.jpg', { eager: true });
+const foto = (n: string) => fotos[`../assets/treballs/${n}.jpg`]!.default;
+const nom: Record<string, string> = { 'perchero-arbol': tx.piezas.perchero, 'mesa-forja': tx.piezas.mesa, 'cartel-herrero': tx.piezas.cartel, cabecero: tx.piezas.cabecero };
+---
+<section aria-labelledby="art-t" class="border-y border-linia bg-crema-2">
+  <div class="mx-auto grid max-w-[90rem] items-center gap-12 px-4 py-20 sm:px-8 sm:py-28 lg:grid-cols-12">
+    <div class="lg:col-span-5">
+      <p class="label text-roig-fosc" data-reveal>{tx.label}</p>
+      <h2 id="art-t" class="titol mt-4 text-[clamp(2.2rem,4.6vw,4rem)]" data-reveal style="--i:1">{tx.title}</h2>
+      <p class="mt-6 max-w-md text-lg text-gris" data-reveal style="--i:2">{tx.text}</p>
+    </div>
+    <ul class="flex flex-wrap items-end justify-center gap-5 lg:col-span-6 lg:col-start-7">
+      {artesania.map((n, i) => (
+        <li class={`bg-white p-2 pb-3 shadow-[0_18px_30px_-18px_rgb(0_0_0/0.5)] ${i % 2 ? 'rotate-[2deg]' : 'rotate-[-2deg]'}`} data-reveal style={`--i:${i}`}>
+          <Image src={foto(n)} alt={nom[n]!} class="block h-44 w-auto object-cover" loading="lazy" />
+          <p class="mt-2 text-center text-sm font-semibold">{nom[n]}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

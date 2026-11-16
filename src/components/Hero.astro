@@ -1,0 +1,27 @@
+---
+import Configurador from './Configurador.astro';
+import { empresa, mailUrl } from '../data/empresa';
+import { ui, home, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang];
+---
+<section aria-labelledby="hero-t">
+  <div class="mx-auto grid max-w-[90rem] items-center gap-12 px-4 pb-20 pt-12 sm:px-8 lg:grid-cols-12 lg:pt-16">
+    <div class="lg:col-span-6">
+      <p class="label flex items-center gap-3 text-gris" data-reveal><span class="h-3 w-3 shrink-0 bg-roig" aria-hidden="true"></span>{tx.hero.eyebrow}</p>
+      <h1 id="hero-t" class="titol mt-6 text-[clamp(2.9rem,6.6vw,6.2rem)]" data-reveal style="--i:1">
+        {tx.hero.t1} <span class="text-roig-fosc">{tx.hero.t2}</span>
+      </h1>
+      <p class="mt-7 max-w-lg text-lg text-gris" data-reveal style="--i:2">{tx.hero.text}</p>
+      <div class="mt-9 flex flex-wrap gap-3" data-reveal style="--i:3">
+        <a href={mailUrl(tx.contacto.asunto)} class="btn btn-ferro">{tx.hero.cta}</a>
+        <a href={`${home(lang)}#trabajos`} class="btn btn-line">{tx.hero.trabajos}</a>
+      </div>
+      <p class="mt-8 text-sm text-gris" data-reveal style="--i:4">{empresa.legalName} · {empresa.city}</p>
+    </div>
+    <div class="lg:col-span-6" data-reveal style="--i:2">
+      <Configurador lang={lang} />
+    </div>
+  </div>
+</section>

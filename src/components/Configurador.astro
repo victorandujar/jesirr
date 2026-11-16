@@ -1,0 +1,93 @@
+---
+import { barana, type Estil, type Color } from '../scripts/barana';
+import { empresa, mailUrl } from '../data/empresa';
+import { ui, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang].conf;
+const inicial = barana('forja', 'negro', 2);
+const estils: Estil[] = ['barrotes', 'forja', 'inox', 'vidrio'];
+const colorsList: Color[] = ['negro', 'grafito', 'blanco', 'verde'];
+const swatch: Record<Color, string> = { negro: '#1b1a18', grafito: '#55524d', blanco: '#f4f2ec', verde: '#2f5d3a' };
+---
+<div id="configurador" class="scroll-mt-24 bg-ferro-2 p-5 text-crema shadow-[0_30px_60px_-30px_rgb(0_0_0/0.6)] sm:p-7" data-conf data-lang={lang}
+  data-txt={JSON.stringify({ estils: tx.estils, colors: tx.colors, inox: tx.inox, asunto: tx.asunto })} data-email={empresa.email}>
+  <div class="flex items-baseline justify-between gap-4">
+    <p class="label text-roig">{tx.label}</p>
+    <p class="text-sm text-crema/60"><span data-resum>{tx.estils.forja} · {tx.colors.negro} · 2 {tx.m}</span></p>
+  </div>
+  <div class="mt-4 bg-crema px-3 py-6">
+    <svg viewBox={inicial.vb} class="h-auto max-h-64 w-full" role="img" aria-label={tx.aria} data-dibuix set:html={inicial.svg} />
+  </div>
+
+  <fieldset class="mt-5">
+    <legend class="label text-crema/70">{tx.estil}</legend>
+    <div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {estils.map((e) => (
+        <label class="cursor-pointer">
+          <input type="radio" name="estil" value={e} class="peer sr-only" checked={e === 'forja'} />
+          <span class="block border border-crema/25 px-3 py-2.5 text-center text-sm font-semibold transition-colors peer-checked:border-roig peer-checked:bg-roig peer-checked:text-ferro peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-crema">{tx.estils[e]}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="mt-5 grid gap-5 sm:grid-cols-2">
+    <fieldset data-colors>
+      <legend class="label text-crema/70">{tx.color}</legend>
+      <div class="mt-2 flex flex-wrap gap-2">
+        {colorsList.map((c) => (
+          <label class="cursor-pointer" title={tx.colors[c]}>
+            <input type="radio" name="color" value={c} class="peer sr-only" checked={c === 'negro'} />
+            <span class="flex items-center gap-2 border border-crema/25 px-3 py-2 text-sm transition-colors peer-checked:border-crema peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-crema">
+              <span class="h-4 w-4 rounded-full border border-crema/40" style={`background:${swatch[c]}`}></span>{tx.colors[c]}
+            </span>
+          </label>
+        ))}
+      </div>
+      <p class="mt-2 hidden text-sm text-crema/60" data-nota-inox>{tx.inox}</p>
+    </fieldset>
+    <div>
+      <label for="ample" class="label flex justify-between text-crema/70"><span>{tx.ample}</span><output class="tabular-nums text-crema" data-metres>2 {tx.m}</output></label>
+      <input id="ample" type="range" min="1" max="5" step="0.5" value="2" class="mt-4 w-full accent-[#ef5a52]" data-ample />
+    </div>
+  </div>
+
+  <p class="mt-5 text-sm text-crema/60">{tx.nota}</p>
+  <a href={mailUrl(tx.asunto, tx.mail(tx.estils.forja, tx.colors.negro, '2'))} class="btn btn-roig mt-4 w-full" data-pressupost>{tx.cta} →</a>
+</div>
+
+<script>
+  import { barana, type Estil, type Color } from '../scripts/barana';
+  import { ui, type Lang } from '../i18n/ui';
+  document.querySelectorAll<HTMLElement>('[data-conf]').forEach((root) => {
+    const lang = root.dataset.lang as Lang;
+    const tx = ui[lang].conf;
+    const svg = root.querySelector<SVGSVGElement>('[data-dibuix]');
+    const resum = root.querySelector<HTMLElement>('[data-resum]');
+    const out = root.querySelector<HTMLOutputElement>('[data-metres]');
+    const ample = root.querySelector<HTMLInputElement>('[data-ample]');
+    const link = root.querySelector<HTMLAnchorElement>('[data-pressupost]');
+    const colorsBox = root.querySelector<HTMLElement>('[data-colors]');
+    const notaInox = root.querySelector<HTMLElement>('[data-nota-inox]');
+    const email = root.dataset.email ?? '';
+    const pinta = () => {
+      const estil = (root.querySelector<HTMLInputElement>('input[name=estil]:checked')?.value ?? 'forja') as Estil;
+      const color = (root.querySelector<HTMLInputElement>('input[name=color]:checked')?.value ?? 'negro') as Color;
+      const metres = Number(ample?.value ?? 2);
+      const r = barana(estil, color, metres);
+      if (svg) { svg.setAttribute('viewBox', r.vb); svg.innerHTML = r.svg; }
+      const esInox = estil === 'inox' || estil === 'vidrio';
+      colorsBox?.querySelectorAll('label').forEach((l) => l.classList.toggle('hidden', esInox));
+      notaInox?.classList.toggle('hidden', !esInox);
+      const nomColor = esInox ? tx.inox.toLowerCase() : tx.colors[color].toLowerCase();
+      const m = String(metres).replace('.', ',');
+      if (out) out.textContent = `${m} ${tx.m}`;
+      if (resum) resum.textContent = `${tx.estils[estil]} · ${esInox ? tx.inox : tx.colors[color]} · ${m} ${tx.m}`;
+      if (link) link.href = `mailto:${email}?subject=${encodeURIComponent(tx.asunto)}&body=${encodeURIComponent(tx.mail(tx.estils[estil].toLowerCase(), nomColor, m))}`;
+    };
+    root.addEventListener('input', pinta);
+    root.addEventListener('change', pinta);
+    pinta();
+  });
+</script>

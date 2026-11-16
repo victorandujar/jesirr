@@ -1,0 +1,22 @@
+---
+import { empresa } from '../data/empresa';
+import { ui, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const data = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: empresa.legalName,
+  alternateName: 'Jesirr',
+  description: ui[lang].meta.description,
+  inLanguage: lang,
+  foundingDate: '1991-03-06',
+  url: Astro.site?.href,
+  telephone: empresa.phone.e164,
+  email: empresa.email,
+  address: { '@type': 'PostalAddress', streetAddress: empresa.street, postalCode: empresa.postalCode, addressLocality: empresa.city, addressRegion: empresa.region, addressCountry: 'ES' },
+  geo: { '@type': 'GeoCoordinates', latitude: empresa.geo.lat, longitude: empresa.geo.lng },
+  areaServed: 'Maresme',
+};
+---
+<script type="application/ld+json" set:html={JSON.stringify(data)} />

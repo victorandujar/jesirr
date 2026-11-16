@@ -1,0 +1,11 @@
+---
+import { mailUrl, telUrl } from '../data/empresa';
+import { ui, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang];
+---
+<nav aria-label={tx.bar.aria} class="fixed inset-x-0 bottom-0 z-40 grid grid-cols-2 lg:hidden">
+  <a href={mailUrl(tx.contacto.asunto)} class="flex min-h-14 items-center justify-center bg-ferro font-semibold text-crema">{tx.bar.email}</a>
+  <a href={telUrl} class="flex min-h-14 items-center justify-center bg-roig-fosc font-semibold text-white">{tx.bar.llamar}</a>
+</nav>
