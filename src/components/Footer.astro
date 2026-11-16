@@ -1,0 +1,18 @@
+---
+import logo from '../assets/logo.svg';
+import { empresa } from '../data/empresa';
+import { ui, legalPath, type Lang } from '../i18n/ui';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const tx = ui[lang];
+---
+<footer class="bg-crema pb-24 text-gris lg:pb-0">
+  <div class="mx-auto grid max-w-[90rem] gap-6 px-4 py-12 sm:px-8 md:grid-cols-3 md:items-end">
+    <img src={logo.src} width="120" height="85" alt={empresa.legalName} class="h-20 w-auto" />
+    <p class="text-sm">{empresa.legalName} · {empresa.street}, {empresa.postalCode} {empresa.city}</p>
+    <ul class="flex gap-5 text-sm md:justify-end">
+      <li><a href={legalPath(lang, 'avis')} class="hover:text-ferro">{tx.footer.avis}</a></li>
+      <li><a href={legalPath(lang, 'priv')} class="hover:text-ferro">{tx.footer.priv}</a></li>
+    </ul>
+  </div>
+</footer>
